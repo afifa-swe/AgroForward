@@ -1,0 +1,45 @@
+:root {
+  /* Зелёные (основа) */
+  --green:    #04523A;
+  --green-d:  #032e21;
+  --green-l:  #0a7a57;
+  --green-xl: #156347;
+
+  /* Терракота (главный акцент) */
+  --terra:    #D56154;
+  --terra-d:  #b04a3f;
+  --terra-l:  #e07b6e;
+
+  /* Текст */
+  --cream:    #F5EFE6;
+  --cream-d:  #ddd4c6;
+  --white:    #FDFAF7;
+  --muted:    #6b8c7d;
+
+  /* Фоны */
+  --dark:     #0d1f18;
+  --dark2:    #111c16;
+
+  /* Служебные */
+  --border:   rgba(245, 239, 230, 0.08);
+  --border-h: rgba(213, 97, 84, 0.3);
+
+  /* Шрифты */
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body:    'Mulish', system-ui, sans-serif;
+
+  /* Геометрия */
+  --radius:    4px;
+  --radius-lg: 8px;
+
+  /* Тени */
+  --shadow-card:  0 20px 50px rgba(0, 0, 0, 0.35);
+  --shadow-btn:   0 4px 20px rgba(213, 97, 84, 0.25);
+  --shadow-btn-h: 0 8px 30px rgba(213, 97, 84, 0.4);
+
+  /* Переходы */
+  --t-fast:   0.2s ease;
+  --t-base:   0.3s ease;
+  --t-slow:   0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  --t-reveal: 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
