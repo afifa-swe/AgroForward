@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, watch, onMounted, nextTick } from 'vue'
+import { ref, reactive, watch, onMounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useReveal, reinitReveals } from '@/composables/useReveal'
+import { sendContactForm } from '@/api/contact'
 import BarChart from '@/components/BarChart.vue'
 
 useReveal()
@@ -36,7 +37,33 @@ watch(() => route.query.tab, (val) => {
 onMounted(() => { if (route.query.tab) activeTab.value = route.query.tab as string })
 
 const formSent = ref(false)
-function sendForm() { formSent.value = true }
+const formLoading = ref(false)
+const formError = ref('')
+const invForm = reactive({ name: '', company: '', email: '', phone: '', subject: 'Инвестиционный меморандум', message: '' })
+
+async function sendForm() {
+  formError.value = ''
+  if (!invForm.name || !invForm.email || !invForm.message) {
+    formError.value = 'Заполните обязательные поля (имя, email, сообщение)'
+    return
+  }
+  formLoading.value = true
+  try {
+    await sendContactForm({
+      name: invForm.name,
+      email: invForm.email,
+      phone: invForm.phone || undefined,
+      company: invForm.company || undefined,
+      subject: invForm.subject,
+      message: invForm.message,
+    })
+    formSent.value = true
+  } catch (e: any) {
+    formError.value = e.response?.data?.message || 'Ошибка отправки. Попробуйте позже.'
+  } finally {
+    formLoading.value = false
+  }
+}
 
 const finData = [
   { yr: '2018', vol: '438 804 кг', growth: '—', status: 'Запуск' },
@@ -234,13 +261,14 @@ const reports = [
           </div>
           <div>
             <template v-if="!formSent">
-              <div class="form-field"><label>Имя и фамилия</label><input type="text" placeholder="Иван Петров"></div>
-              <div class="form-field"><label>Организация</label><input type="text" placeholder="Название фонда"></div>
-              <div class="form-field"><label>Email</label><input type="email" placeholder="investor@fund.ru"></div>
-              <div class="form-field"><label>Телефон</label><input type="tel" placeholder="+7 (000) 000-00-00"></div>
-              <div class="form-field"><label>Интерес</label><select><option>Инвестиционный меморандум</option><option>Финансовая отчётность</option><option>Условия участия</option><option>Общие вопросы</option></select></div>
-              <div class="form-field"><label>Сообщение</label><textarea placeholder="Расскажите о вашем интересе…"></textarea></div>
-              <button class="btn-p" style="width:100%" @click="sendForm">Отправить запрос</button>
+              <div class="form-field"><label>Имя и фамилия *</label><input v-model="invForm.name" type="text" placeholder="Иван Петров"></div>
+              <div class="form-field"><label>Организация</label><input v-model="invForm.company" type="text" placeholder="Название фонда"></div>
+              <div class="form-field"><label>Email *</label><input v-model="invForm.email" type="email" placeholder="investor@fund.ru"></div>
+              <div class="form-field"><label>Телефон</label><input v-model="invForm.phone" type="tel" placeholder="+7 (000) 000-00-00"></div>
+              <div class="form-field"><label>Интерес</label><select v-model="invForm.subject"><option>Инвестиционный меморандум</option><option>Финансовая отчётность</option><option>Условия участия</option><option>Общие вопросы</option></select></div>
+              <div class="form-field"><label>Сообщение *</label><textarea v-model="invForm.message" placeholder="Расскажите о вашем интересе…"></textarea></div>
+              <div v-if="formError" class="form-error">{{ formError }}</div>
+              <button class="btn-p" style="width:100%" :disabled="formLoading" @click="sendForm">{{ formLoading ? 'Отправка...' : 'Отправить запрос' }}</button>
             </template>
             <div v-else class="form-success">Спасибо! Ваш запрос отправлен. Мы свяжемся с вами в ближайшее время.</div>
           </div>
@@ -304,6 +332,16 @@ const reports = [
   border-radius: 4px;
   color: var(--cream);
   text-align: center;
+}
+
+.form-error {
+  padding: .8rem 1rem;
+  background: rgba(213,97,84,.15);
+  border: 1px solid var(--terra);
+  border-radius: 4px;
+  color: var(--terra);
+  font-size: .85rem;
+  margin-bottom: 1rem;
 }
 
 @media (max-width: 768px) {

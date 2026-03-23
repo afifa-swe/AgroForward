@@ -1,4 +1,4 @@
-FROM php:8.2-fpm-alpine
+FROM php:8.4-fpm-alpine
 
 RUN apk add --no-cache \
     postgresql-dev \
@@ -6,13 +6,17 @@ RUN apk add --no-cache \
     zip \
     unzip \
     git \
-    curl
+    curl \
+    linux-headers \
+    $PHPIZE_DEPS
 
 RUN docker-php-ext-install \
     pdo \
     pdo_pgsql \
     zip \
     opcache
+
+RUN pecl install redis && docker-php-ext-enable redis
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
