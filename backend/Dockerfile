@@ -22,10 +22,13 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-RUN php artisan config:clear && php artisan route:clear && php artisan view:clear
-
 RUN chmod -R 775 storage bootstrap/cache
 
-EXPOSE 8080
+EXPOSE 10000
 
-CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8080
+CMD php artisan config:clear \
+    && php artisan route:clear \
+    && php artisan view:clear \
+    && php artisan cache:clear \
+    && php artisan migrate --force \
+    && php artisan serve --host=0.0.0.0 --port=10000
